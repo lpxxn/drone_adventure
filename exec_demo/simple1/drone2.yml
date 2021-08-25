@@ -1,0 +1,20 @@
+kind: pipeline
+type: docker
+name: default
+
+global-variables:
+  debian_image: &debian_image alpine
+  environment: &default_environment
+    HOSTA: postgresA
+    USERA: postgresB
+
+steps:
+  - name: test
+    image: *debian_image
+    environment:
+      A: ZHANGSAN
+      <<: *default_environment
+    commands:
+      - echo hello $A $$A
+      - "echo user: $${USERA} host: $${HOSTA}"
+      - echo world
