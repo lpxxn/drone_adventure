@@ -9,4 +9,6 @@ steps:
       A: ZHANGSAN
     commands:
       - echo hello $A $$A
+      - "echo hello ${A} $${A}"
+      - "echo hello $A $$A"
       - echo world
