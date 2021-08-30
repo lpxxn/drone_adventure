@@ -53,12 +53,14 @@ func main() {
 	// *[]*struct { Height float64 "json:\"height\""; Age int "json:\"age\"" }
 	fmt.Println("newSvPtr: ", newSvPtr.Type())
 	newSvPtrV := newSvPtr.Interface()
-	fmt.Println(newSvPtrV)
 	body := []byte(`[{"height":1.5,"age":10}, {"height":8.2,"age":765}]`)
-	if err := json.Unmarshal(body, newSvPtr.Interface()); err != nil {
+	if err := json.Unmarshal(body, newSvPtrV); err != nil {
 		panic(err)
 	}
+	loopSlice(newSvPtr.Elem().Interface())
 	fmt.Println(newSvPtr)
+
+	fmt.Println(`-------`)
 
 	newPtrValue = reflect.New(typ)
 	v = newPtrValue.Elem()
@@ -70,11 +72,31 @@ func main() {
 	if err := json.Unmarshal(body, &svInterface); err != nil {
 		panic(err)
 	}
+	// 会变成map
 	loopSlice(svInterface)
+	fmt.Println("begin loop sv 1 ")
+	// 没有数据
+	loopSlice(sv.Interface())
+	fmt.Println("end loop sv 1 ")
+	// 这样，创建一个pointer
+	// Create a pointer to a slice value and set it to the slice
+	x := reflect.New(sv.Type())
+	x.Elem().Set(sv)
+	xInterface := x.Interface()
+
+	if err := json.Unmarshal(body, xInterface); err != nil {
+		panic(err)
+	}
+	loopSlice(x.Elem().Interface())
+
+	//sv = reflect.AppendSlice(sv, reflect.ValueOf(svInterface))
 	//sv.Set(reflect.ValueOf(svInterface))
 	sv = reflect.Append(sv, v)
+	fmt.Printf("sv type := %#v \n", sv.Type())
+
 	fmt.Printf("%#v \n", sv.Interface())
 	loopSlice(sv.Interface())
+
 	fmt.Println("end sv ---")
 	v.Field(0).SetFloat(2.3)
 	v.Field(1).SetInt(980)
@@ -92,7 +114,7 @@ func main() {
 
 func loopSlice(t interface{}) {
 	sL := reflect.ValueOf(t)
-
+	fmt.Println("loopSlice type: ", sL.Type())
 	for i := 0; i < sL.Len(); i++ {
 		fmt.Println("item: ", sL.Index(i))
 	}
