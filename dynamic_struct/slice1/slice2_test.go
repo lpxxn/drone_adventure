@@ -2,6 +2,6 @@ package main
 
 import "testing"
 
-func TestSliceAppend(t *teßßsting.T) {
+func TestSliceAppend(t *testing.T) {
 
 }
